@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Welcome – DSA Playground</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root{
+  --bg-main:#0f1115;
+  --accent:#e53935;
+  --accent-soft:#ff6b6b;
+  --text-main:#ffffff;
+  --text-muted:#b0b3c1;
+  --glass:rgba(255,255,255,0.05);
+}
+
+/* GLOBAL RESET */
+*{margin:0; padding:0; box-sizing:border-box;}
+body{
+  font-family: "Segoe UI", system-ui, sans-serif;
+  min-height:100vh;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(-45deg, #0f1115, #1c1f26, #0d0f13, #1a1d22);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: var(--text-main);
+}
+
+/* GRADIENT ANIMATION */
+@keyframes gradientBG{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* FLOATING SHAPES */
+.shape{
+  position:absolute;
+  border-radius:50%;
+  opacity:0.1;
+  animation:float 8s infinite alternate;
+}
+.shape1{ width:220px; height:220px; background:var(--accent); top:10%; left:10%; animation-delay:0s;}
+.shape2{ width:160px; height:160px; background:var(--accent-soft); top:60%; left:80%; animation-delay:2s;}
+.shape3{ width:120px; height:120px; background:var(--accent); top:40%; left:50%; animation-delay:4s;}
+@keyframes float{
+  0%{ transform: translateY(0px) translateX(0px);}
+  50%{ transform: translateY(-30px) translateX(20px);}
+  100%{ transform: translateY(0px) translateX(0px);}
+}
+
+/* WELCOME CARD */
+.welcome-card{
+  backdrop-filter: blur(15px);
+  background: var(--glass);
+  border-radius:25px;
+  padding:50px 40px;
+  text-align:center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255, 83, 83, 0.2) inset;
+  border:1px solid rgba(255,255,255,0.1);
+  animation:fadeIn 1.5s ease forwards;
+  max-width: 400px;
+  width:90%;
+}
+
+@keyframes fadeIn{
+  0%{ opacity:0; transform:translateY(-50px);}
+  100%{ opacity:1; transform:translateY(0);}
+}
+
+.welcome-card h1{
+  font-size:36px;
+  color:var(--accent);
+  margin-bottom:15px;
+  text-shadow: 0 0 10px rgba(255, 83, 83, 0.7);
+}
+
+.welcome-card p{
+  font-size:16px;
+  color:var(--text-muted);
+  margin-bottom:35px;
+  line-height:1.5;
+}
+
+/* START BUTTON */
+button{
+  background: linear-gradient(45deg, var(--accent), var(--accent-soft));
+  color:white;
+  font-weight:bold;
+  border:none;
+  border-radius:15px;
+  padding:15px 35px;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.4s;
+  box-shadow:0 6px 25px rgba(0,0,0,0.5), 0 0 15px rgba(255, 83, 83,0.5) inset;
+}
+
+button:hover{
+  transform:scale(1.05);
+  box-shadow:0 10px 40px rgba(0,0,0,0.7), 0 0 30px rgba(255, 83, 83,0.7) inset;
+}
+
+/* RESPONSIVE */
+@media(max-width:500px){
+  .welcome-card{ padding:35px 25px;}
+  .welcome-card h1{ font-size:28px;}
+  .welcome-card p{ font-size:14px;}
+  button{ padding:12px 25px; font-size:14px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="shape shape1"></div>
+<div class="shape shape2"></div>
+<div class="shape shape3"></div>
+
+<div class="welcome-card">
+  <h1>Welcome to DSA Playground</h1>
+  <p>Explore interactive simulations of data structures and algorithms. Click below to start your journey!</p>
+  <button onclick="startDSA()">Start Now</button>
+</div>
+
+<script>
+// SweetAlert2 greeting
+window.onload = () => {
+  Swal.fire({
+    title: 'Hello!',
+    text: 'Welcome to DSA Playground – your interactive learning platform!',
+    icon: 'info',
+    confirmButtonText: 'Let\'s Go',
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff',
+    showClass: { popup: 'animate__animated animate__fadeInDown' },
+    hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+  });
+}
+
+// Start Button Function
+function startDSA() {
+  Swal.fire({
+    title: 'Ready to Explore?',
+    html: '<p style="color:#ffffff;">You are about to enter the DSA Playground – interactive simulations await!</p>',
+    background: 'rgba(28,31,38,0.95)',  // dark glass theme
+    color: '#ffffff',
+    showCancelButton: true,
+    confirmButtonText: 'Let\'s Go!',
+    cancelButtonText: 'Not Yet',
+    confirmButtonColor: '#e53935',  // red accent
+    cancelButtonColor: '#555555',   // muted cancel button
+    backdrop: `
+      rgba(15,17,21,0.7)
+    `,
+    showClass: { popup: 'animate__animated animate__fadeInDown' },
+    hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = "Main.html"; // direct redirect without counting
+    }
+  });
+}
+
+
+</script>
+
+</body>
+</html>

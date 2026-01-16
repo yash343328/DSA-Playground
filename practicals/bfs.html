@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Graph Traversal (BFS) – DSA Playground</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root{
+  --bg-main:#0f1115;
+  --bg-card:#1c1f26;
+  --accent:#e53935;
+  --accent-soft:#ff6b6b;
+  --text-main:#ffffff;
+  --text-muted:#b0b3c1;
+}
+
+/* GLOBAL RESET */
+*{margin:0; padding:0; box-sizing:border-box;}
+body{
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1c1f26, var(--bg-main));
+  color:var(--text-main);
+  min-height:100vh;
+}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(90deg,var(--accent),#b71c1c);
+  padding:18px 10px;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+header h1{ font-size:26px; }
+header p{ font-size:14px; opacity:0.9; }
+
+/* Instructions Button */
+#instructionBtn{
+  position:absolute;
+  right:20px;
+  top:15px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent-soft);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:0.3s;
+}
+
+#instructionBtn:hover{ background:var(--accent); }
+
+/* MAIN LAYOUT */
+main{ padding:30px 5%; }
+.section-title{ text-align:center; font-size:22px; margin-bottom:30px; color:var(--accent-soft); }
+
+/* PANEL */
+.panel{
+  background:var(--bg-card);
+  border-radius:16px;
+  padding:25px 20px;
+  margin-bottom:30px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  transition:all 0.4s ease;
+}
+.panel:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* INPUTS & BUTTONS */
+input, button{
+  font-family: inherit;
+  font-size:14px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  padding:10px;
+}
+
+input{
+  width:60%;
+  margin-right:10px;
+  background:var(--bg-main);
+  color:var(--text-main);
+  border:1px solid var(--accent);
+}
+
+button{
+  background:var(--accent);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{ background:var(--accent-soft); }
+
+/* GRAPH DISPLAY */
+.graph-container{
+  display:flex;
+  flex-wrap: wrap;
+  justify-content:center;
+  gap:20px;
+  margin-top:20px;
+  position:relative;
+  min-height:300px;
+  border:1px solid #333;
+  border-radius:16px;
+  padding:20px;
+}
+
+.node{
+  width:60px;
+  height:60px;
+  background:linear-gradient(135deg,#e53935,#ff6b6b);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+  position:relative;
+}
+
+.node.active{
+  background:linear-gradient(135deg,#ffb74d,#ff9800);
+  transform: scale(1.2);
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+
+.node.visited{
+  background:linear-gradient(135deg,#4caf50,#81c784);
+}
+
+/* EDGES */
+.edge{
+  position:absolute;
+  height:2px;
+  background:#888;
+  transform-origin: left;
+}
+
+/* FOOTER */
+footer{
+  margin-top:40px;
+  padding:15px;
+  text-align:center;
+  background:#12141a;
+  color:#aaa;
+  font-size:14px;
+  border-top:1px solid #222;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  input{ width:100%; margin-bottom:10px; }
+  button{ width:48%; margin-bottom:10px; }
+  .node{ width:50px; height:50px; font-size:14px; }
+  #instructionBtn{ top:10px; right:10px; width:35px; height:35px; font-size:16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Graph Traversal (BFS)</h1>
+  <p>Interactive DSA Playground – Yash Jain</p>
+  <button id="instructionBtn" onclick="showInstructions()">i</button>
+</header>
+
+<main>
+  <div class="section-title">Visualize BFS Traversal</div>
+
+  <div class="panel">
+    <h3>Add Node</h3>
+    <input type="text" id="nodeInput" placeholder="Node name (e.g., A)">
+    <button onclick="addNode()">Add Node</button>
+  </div>
+
+  <div class="panel">
+    <h3>Add Edge</h3>
+    <input type="text" id="edgeInput" placeholder="From-To (e.g., A-B)">
+    <button onclick="addEdge()">Add Edge</button>
+  </div>
+
+  <div class="panel">
+    <h3>Graph</h3>
+    <div class="graph-container" id="graphDisplay"></div>
+  </div>
+
+  <div class="panel">
+    <input type="text" id="startNode" placeholder="Start Node for BFS">
+    <button onclick="startBFS()">Start BFS</button>
+    <button style="background:#444;" onclick="clearGraph()">Clear Graph</button>
+  </div>
+</main>
+
+<footer>
+  © 2026 Yash Jain. All Rights Reserved.
+</footer>
+
+<script>
+let nodes = [];
+let edges = [];
+const graphContainer = document.getElementById("graphDisplay");
+
+// ======================
+// SweetAlert2 Wrapper
+// ======================
+function showMessage(title,text,icon='success'){
+  Swal.fire({
+    title:title,
+    text:text,
+    icon:icon,
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+// ======================
+// Add Node
+// ======================
+function addNode(){
+  const val = document.getElementById("nodeInput").value.trim();
+  if(!val) { showMessage('Error','Enter node value!','error'); return; }
+  if(nodes.find(n=>n.name===val)){ showMessage('Error','Node already exists!','error'); return; }
+  const node = {name:val,x: Math.random()*400 + 50, y: Math.random()*200 + 50};
+  nodes.push(node);
+  renderGraph();
+  document.getElementById("nodeInput").value='';
+  showMessage('Node Added',`Node ${val} added successfully!`);
+}
+
+// ======================
+// Add Edge
+// ======================
+function addEdge(){
+  const val = document.getElementById("edgeInput").value.trim();
+  if(!val.includes('-')){ showMessage('Error','Format must be From-To','error'); return; }
+  const [from,to] = val.split('-');
+  if(!nodes.find(n=>n.name===from)||!nodes.find(n=>n.name===to)){ showMessage('Error','Nodes must exist!','error'); return; }
+  edges.push({from,to});
+  renderGraph();
+  document.getElementById("edgeInput").value='';
+  showMessage('Edge Added',`Edge ${from}-${to} added successfully!`);
+}
+
+// ======================
+// Render Graph
+// ======================
+function renderGraph(activeNode=null,visitedNodes=[]){
+  graphContainer.innerHTML = '';
+  edges.forEach(e=>{
+    const n1 = nodes.find(n=>n.name===e.from);
+    const n2 = nodes.find(n=>n.name===e.to);
+    if(!n1 || !n2) return;
+    const x1 = n1.x+30, y1 = n1.y+30;
+    const x2 = n2.x+30, y2 = n2.y+30;
+    const edge = document.createElement('div');
+    edge.className='edge';
+    const length = Math.hypot(x2-x1,y2-y1);
+    edge.style.width=length+'px';
+    const angle = Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+    edge.style.transform=`rotate(${angle}deg)`;
+    edge.style.left=x1+'px';
+    edge.style.top=y1+'px';
+    graphContainer.appendChild(edge);
+  });
+  nodes.forEach(n=>{
+    const div = document.createElement('div');
+    div.className='node';
+    if(n.name===activeNode) div.classList.add('active');
+    if(visitedNodes.includes(n.name)) div.classList.add('visited');
+    div.textContent=n.name;
+    div.style.left=n.x+'px';
+    div.style.top=n.y+'px';
+    graphContainer.appendChild(div);
+  });
+}
+
+// ======================
+// BFS Animation
+// ======================
+async function startBFS(){
+  const start = document.getElementById("startNode").value.trim();
+  if(!start) { showMessage('Error','Enter start node!','error'); return; }
+  if(!nodes.find(n=>n.name===start)){ showMessage('Error','Start node must exist!','error'); return; }
+  const visited = [];
+  const queue = [start];
+  while(queue.length>0){
+    const current = queue.shift();
+    if(!visited.includes(current)){
+      visited.push(current);
+      renderGraph(current,visited);
+      await new Promise(r=>setTimeout(r,800));
+      const neighbors = edges.filter(e=>e.from===current).map(e=>e.to);
+      neighbors.forEach(n=>{ if(!visited.includes(n)) queue.push(n); });
+    }
+  }
+  renderGraph(null,visited);
+  showMessage('Traversal Completed','BFS traversal completed!');
+}
+
+// ======================
+// Clear Graph
+// ======================
+function clearGraph(){
+  nodes=[]; edges=[];
+  renderGraph();
+  showMessage('Cleared','Graph has been cleared.');
+}
+
+// ======================
+// Instructions
+// ======================
+function showInstructions(){
+  Swal.fire({
+    title: '<strong>BFS Traversal Instructions</strong>',
+    html: `
+    <div style="text-align:left; font-size:16px; line-height:1.6;">
+      <ul style="padding-left:20px;">
+        <li>Add nodes manually using the "Add Node" input.</li>
+        <li>Add edges using "From-To" format (e.g., A-B).</li>
+        <li>Click "Start BFS" and provide start node to see traversal animation.</li>
+        <li>Active node is highlighted orange; visited nodes turn green.</li>
+        <li>Click "Clear Graph" to reset.</li>
+      </ul>
+    </div>
+    `,
+    icon:'info',
+    confirmButtonText:'Got it!',
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+renderGraph();
+</script>
+
+</body>
+</html>

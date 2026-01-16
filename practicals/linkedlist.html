@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Linked List Simulator – DSA Playground</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root{
+  --bg-main:#0f1115;
+  --bg-card:#1c1f26;
+  --accent:#e53935;
+  --accent-soft:#ff6b6b;
+  --text-main:#ffffff;
+  --text-muted:#b0b3c1;
+}
+
+/* GLOBAL RESET */
+*{margin:0; padding:0; box-sizing:border-box;}
+body{
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1c1f26, var(--bg-main));
+  color:var(--text-main);
+  min-height:100vh;
+  line-height:1.6;
+}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(90deg,var(--accent),#b71c1c);
+  padding:18px 10px;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+header h1{ font-size:26px; }
+header p{ font-size:14px; opacity:0.9; }
+
+/* Instructions Button */
+#instructionBtn{
+  position:absolute;
+  right:20px;
+  top:15px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent-soft);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:0.3s;
+}
+
+#instructionBtn:hover{ background:var(--accent); }
+
+/* MAIN LAYOUT */
+main{ padding:30px 5%; }
+.section-title{ text-align:center; font-size:22px; margin-bottom:30px; color:var(--accent-soft); }
+
+/* PANEL */
+.panel{
+  background:var(--bg-card);
+  border-radius:16px;
+  padding:25px 20px;
+  margin-bottom:30px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  transition:all 0.4s ease;
+}
+.panel:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* INPUTS & BUTTONS */
+input, button{
+  font-family: inherit;
+  font-size:14px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  padding:10px;
+}
+
+input{
+  width:60%;
+  margin-right:10px;
+  background:var(--bg-main);
+  color:var(--text-main);
+  border:1px solid var(--accent);
+}
+
+button{
+  background:var(--accent);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{ background:var(--accent-soft); }
+
+/* LINKED LIST DISPLAY */
+.linkedlist-display{
+  display:flex;
+  gap:15px;
+  flex-wrap: wrap;
+  justify-content:center;
+  margin-top:20px;
+  min-height:80px;
+  align-items:center;
+}
+
+.node{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.node-box{
+  width:60px;
+  height:60px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#e53935,#ff6b6b);
+  border-radius:12px;
+  font-weight:bold;
+  color:white;
+  font-size:16px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position:relative;
+}
+
+.node-box:hover{
+  transform: scale(1.1);
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+
+.arrow{
+  width:40px;
+  height:4px;
+  background:var(--accent);
+  border-radius:2px;
+  position:relative;
+  top:28px;
+}
+
+.arrow::after{
+  content:'';
+  position:absolute;
+  right:-8px;
+  top:-6px;
+  border-top:6px solid transparent;
+  border-bottom:6px solid transparent;
+  border-left:8px solid var(--accent);
+}
+
+/* FOOTER */
+footer{
+  margin-top:40px;
+  padding:15px;
+  text-align:center;
+  background:#12141a;
+  color:#aaa;
+  font-size:14px;
+  border-top:1px solid #222;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  input{ width:100%; margin-bottom:10px; }
+  button{ width:48%; margin-bottom:10px; }
+  .node-box{ width:50px; height:50px; font-size:14px; }
+  .arrow{ width:30px; top:22px; }
+  #instructionBtn{ top:10px; right:10px; width:35px; height:35px; font-size:16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Linked List Simulator</h1>
+  <p>Interactive DSA Playground – Yash Jain</p>
+  <button id="instructionBtn" onclick="showInstructions()">i</button>
+</header>
+
+<main>
+  <div class="section-title">Manage Your Linked List</div>
+
+  <div class="panel">
+    <h3>Insert at Head</h3>
+    <input type="number" id="headValue" placeholder="Enter value">
+    <button onclick="insertHead()">Insert Head</button>
+  </div>
+
+  <div class="panel">
+    <h3>Insert at Tail</h3>
+    <input type="number" id="tailValue" placeholder="Enter value">
+    <button onclick="insertTail()">Insert Tail</button>
+  </div>
+
+  <div class="panel">
+    <h3>Delete Node</h3>
+    <input type="number" id="deleteValue" placeholder="Enter value to delete">
+    <button onclick="deleteNode()">Delete Node</button>
+  </div>
+
+  <div class="panel">
+    <h3>Current Linked List</h3>
+    <div class="linkedlist-display" id="linkedListDisplay">
+      <!-- Nodes appear here -->
+    </div>
+  </div>
+
+  <div class="panel">
+    <button style="background:#444;" onclick="clearList()">Clear List</button>
+  </div>
+</main>
+
+<footer>
+  © 2026 Yash Jain. All Rights Reserved.
+</footer>
+
+<script>
+// ======================
+// Linked List Storage
+// ======================
+let linkedList = [];
+
+// ======================
+// Display Linked List
+// ======================
+function renderList(){
+  const container = document.getElementById("linkedListDisplay");
+  container.innerHTML = '';
+  if(linkedList.length===0){
+    container.innerHTML = '<p style="color:#aaa; text-align:center; width:100%;">Linked list is empty</p>';
+    return;
+  }
+  linkedList.forEach((val,index)=>{
+    const node = document.createElement('div');
+    node.className='node';
+    
+    const box = document.createElement('div');
+    box.className='node-box';
+    box.textContent=val;
+    node.appendChild(box);
+
+    if(index<linkedList.length-1){
+      const arrow = document.createElement('div');
+      arrow.className='arrow';
+      node.appendChild(arrow);
+    }
+
+    container.appendChild(node);
+  });
+}
+
+// ======================
+// SweetAlert2 Wrapper
+// ======================
+function showMessage(title,text,icon='success'){
+  Swal.fire({
+    title:title,
+    text:text,
+    icon:icon,
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+// ======================
+// Insert at Head
+// ======================
+function insertHead(){
+  const val = document.getElementById("headValue").value;
+  if(val===''){ showMessage('Error','Enter a value!','error'); return; }
+  linkedList.unshift(Number(val));
+  renderList();
+  document.getElementById("headValue").value='';
+  showMessage('Inserted','Value '+val+' added at head.');
+}
+
+// ======================
+// Insert at Tail
+// ======================
+function insertTail(){
+  const val = document.getElementById("tailValue").value;
+  if(val===''){ showMessage('Error','Enter a value!','error'); return; }
+  linkedList.push(Number(val));
+  renderList();
+  document.getElementById("tailValue").value='';
+  showMessage('Inserted','Value '+val+' added at tail.');
+}
+
+// ======================
+// Delete Node
+// ======================
+function deleteNode(){
+  const val = document.getElementById("deleteValue").value;
+  if(val===''){ showMessage('Error','Enter a value!','error'); return; }
+  const index = linkedList.indexOf(Number(val));
+  if(index===-1){ showMessage('Not Found','Value '+val+' not found in list.','warning'); return; }
+  linkedList.splice(index,1);
+  renderList();
+  document.getElementById("deleteValue").value='';
+  showMessage('Deleted','Value '+val+' removed from list.');
+}
+
+// ======================
+// Clear List
+// ======================
+function clearList(){
+  linkedList=[];
+  renderList();
+  showMessage('Cleared','The linked list has been emptied.');
+}
+
+// ======================
+// Instructions
+// ======================
+function showInstructions(){
+  Swal.fire({
+    title: '<strong>Linked List Instructions</strong>',
+    html: `
+    <div style="text-align:left; font-size:16px; line-height:1.6;">
+      <ul style="padding-left:20px;">
+        <li><b>Insert at Head:</b> Add a node at the beginning.</li>
+        <li><b>Insert at Tail:</b> Add a node at the end.</li>
+        <li><b>Delete Node:</b> Remove a node by its value.</li>
+        <li><b>Clear List:</b> Empties the entire linked list.</li>
+        <li>Nodes are visually connected with arrows showing <b>links</b>.</li>
+      </ul>
+    </div>
+    `,
+    icon:'info',
+    confirmButtonText:'Got it!',
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+renderList();
+</script>
+
+</body>
+</html>

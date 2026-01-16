@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Playground – Yash Jain</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* =========================
+   ROOT VARIABLES
+========================= */
+:root{
+  --bg-main:#0f1115;
+  --bg-card:#1c1f26;
+  --accent:#e53935;
+  --accent-soft:#ff6b6b;
+  --text-main:#ffffff;
+  --text-muted:#b0b3c1;
+  --glass:rgba(255,255,255,0.06);
+  --blur:blur(12px);
+}
+
+/* =========================
+   GLOBAL RESET
+========================= */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1c1f26, var(--bg-main));
+  color:var(--text-main);
+  min-height:100vh;
+  line-height:1.6;
+}
+
+/* =========================
+   HEADER
+========================= */
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(90deg,var(--accent),#b71c1c);
+  padding:18px 10px;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+}
+
+header h1{
+  font-size:28px;
+  letter-spacing:1px;
+}
+
+header p{
+  font-size:14px;
+  opacity:0.9;
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+main{
+  padding:30px 5%;
+}
+
+.section-title{
+  text-align:center;
+  font-size:22px;
+  margin-bottom:30px;
+  color:var(--accent-soft);
+}
+
+/* =========================
+   GRID
+========================= */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+/* =========================
+   CARD
+========================= */
+.card{
+  position:relative;
+  background:var(--bg-card);
+  border-radius:16px;
+  padding:25px 20px;
+  cursor:pointer;
+  transition:all 0.4s ease;
+  overflow:hidden;
+  border:1px solid transparent;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:150px;
+}
+
+/* glass shine */
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.08),
+    transparent
+  );
+  transform:translateX(-100%);
+  transition:0.6s;
+  border-radius:16px;
+}
+
+.card:hover::before{
+  transform:translateX(100%);
+}
+
+.card:hover{
+  transform:translateY(-5px) scale(1.02);
+  border-color:var(--accent);
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+.card h3{
+  font-size:18px;
+  margin-bottom:8px;
+}
+
+.card p{
+  font-size:13px;
+  color:var(--text-muted);
+  line-height:1.4;
+}
+
+/* =========================
+   BADGE
+========================= */
+.badge{
+  position:absolute;
+  top:15px;
+  right:15px;
+  padding:5px 10px;
+  font-size:11px;
+  border-radius:20px;
+  background:var(--accent);
+  color:white;
+  font-weight:bold;
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer{
+  margin-top:40px;
+  padding:15px;
+  text-align:center;
+  background:#12141a;
+  color:#aaa;
+  font-size:14px;
+  border-top:1px solid #222;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:800px){
+  main{
+    padding:20px 5%;
+  }
+  .card{
+    min-height:140px;
+    padding:20px;
+  }
+  .card h3{
+    font-size:17px;
+  }
+  .card p{
+    font-size:12px;
+  }
+}
+
+@media(max-width:500px){
+  header h1{font-size:22px;}
+  header p{font-size:12px;}
+  .grid{
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+  }
+  .card{
+    min-height:130px;
+    padding:15px;
+  }
+  .card h3{font-size:16px;}
+  .card p{font-size:11px;}
+  .badge{
+    top:10px;
+    right:10px;
+    padding:4px 8px;
+    font-size:10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>DSA Playground</h1>
+  <p>Built & maintained by Yash Jain</p>
+</header>
+
+<main>
+  <div class="section-title">Data Structures & Algorithms</div>
+
+  <div class="grid">
+
+    <div class="card" onclick="openLab('array.html')">
+      <span class="badge">DS</span>
+      <h3>Array Operations</h3>
+      <p>Insert, delete, traverse, and understand array fundamentals visually.</p>
+    </div>
+
+    <div class="card" onclick="openLab('stack.html')">
+      <span class="badge">DS</span>
+      <h3>Stack</h3>
+      <p>LIFO based stack simulation with push and pop operations.</p>
+    </div>
+
+    <div class="card" onclick="openLab('queue.html')">
+      <span class="badge">DS</span>
+      <h3>Queue</h3>
+      <p>FIFO queue simulation with enqueue and dequeue.</p>
+    </div>
+
+    <div class="card" onclick="openLab('linkedlist.html')">
+      <span class="badge">DS</span>
+      <h3>Linked List</h3>
+      <p>Node-based linked list creation and traversal.</p>
+    </div>
+
+    <div class="card" onclick="openLab('linear-search.html')">
+      <span class="badge">Algo</span>
+      <h3>Linear Search</h3>
+      <p>Step-by-step search visualization in an unsorted list.</p>
+    </div>
+
+    <div class="card" onclick="openLab('binary-search.html')">
+      <span class="badge">Algo</span>
+      <h3>Binary Search</h3>
+      <p>Divide and conquer searching on sorted data.</p>
+    </div>
+
+    <div class="card" onclick="openLab('bubble-sort.html')">
+      <span class="badge">Algo</span>
+      <h3>Bubble Sort</h3>
+      <p>Animated swapping and comparison-based sorting.</p>
+    </div>
+
+    <div class="card" onclick="openLab('merge-sort.html')">
+      <span class="badge">Algo</span>
+      <h3>Merge Sort</h3>
+      <p>Recursive divide and merge sorting visualization.</p>
+    </div>
+
+    <div class="card" onclick="openLab('tree-inorder.html')">
+      <span class="badge">Tree</span>
+      <h3>Tree Traversal (Inorder)</h3>
+      <p>Visual inorder traversal of a binary tree.</p>
+    </div>
+
+    <div class="card" onclick="openLab('bfs.html')">
+      <span class="badge">Graph</span>
+      <h3>Graph Traversal (BFS)</h3>
+      <p>Breadth-first traversal using queue logic.</p>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  © 2026 Yash Jain. All Rights Reserved.
+</footer>
+
+<script>
+function openLab(page){
+  window.location.href = "practicals/" + page;
+}
+</script>
+
+</body>
+</html>

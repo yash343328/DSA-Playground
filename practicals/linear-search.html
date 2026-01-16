@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Linear Search Simulator – DSA Playground</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root{
+  --bg-main:#0f1115;
+  --bg-card:#1c1f26;
+  --accent:#e53935;
+  --accent-soft:#ff6b6b;
+  --text-main:#ffffff;
+  --text-muted:#b0b3c1;
+}
+
+/* GLOBAL RESET */
+*{margin:0; padding:0; box-sizing:border-box;}
+body{
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1c1f26, var(--bg-main));
+  color:var(--text-main);
+  min-height:100vh;
+  line-height:1.6;
+}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(90deg,var(--accent),#b71c1c);
+  padding:18px 10px;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+header h1{ font-size:26px; }
+header p{ font-size:14px; opacity:0.9; }
+
+/* Instructions Button */
+#instructionBtn{
+  position:absolute;
+  right:20px;
+  top:15px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent-soft);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:0.3s;
+}
+
+#instructionBtn:hover{ background:var(--accent); }
+
+/* MAIN LAYOUT */
+main{ padding:30px 5%; }
+.section-title{ text-align:center; font-size:22px; margin-bottom:30px; color:var(--accent-soft); }
+
+/* PANEL */
+.panel{
+  background:var(--bg-card);
+  border-radius:16px;
+  padding:25px 20px;
+  margin-bottom:30px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  transition:all 0.4s ease;
+}
+.panel:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* INPUTS & BUTTONS */
+input, button{
+  font-family: inherit;
+  font-size:14px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  padding:10px;
+}
+
+input{
+  width:60%;
+  margin-right:10px;
+  background:var(--bg-main);
+  color:var(--text-main);
+  border:1px solid var(--accent);
+}
+
+button{
+  background:var(--accent);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{ background:var(--accent-soft); }
+
+/* ARRAY DISPLAY */
+.array-display{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+  justify-content:center;
+  margin-top:20px;
+  min-height:80px;
+  align-items:center;
+}
+
+.array-element{
+  width:60px;
+  height:60px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#e53935,#ff6b6b);
+  border-radius:12px;
+  font-weight:bold;
+  color:white;
+  font-size:16px;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.array-element.active{
+  background:linear-gradient(135deg,#ffb74d,#ff9800);
+  transform: scale(1.1);
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+
+.array-element.found{
+  background:linear-gradient(135deg,#4caf50,#81c784);
+}
+
+/* FOOTER */
+footer{
+  margin-top:40px;
+  padding:15px;
+  text-align:center;
+  background:#12141a;
+  color:#aaa;
+  font-size:14px;
+  border-top:1px solid #222;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  input{ width:100%; margin-bottom:10px; }
+  button{ width:48%; margin-bottom:10px; }
+  .array-element{ width:50px; height:50px; font-size:14px; }
+  #instructionBtn{ top:10px; right:10px; width:35px; height:35px; font-size:16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Linear Search Simulator</h1>
+  <p>Interactive DSA Playground – Yash Jain</p>
+  <button id="instructionBtn" onclick="showInstructions()">i</button>
+</header>
+
+<main>
+  <div class="section-title">Perform Linear Search</div>
+
+  <div class="panel">
+    <h3>Enter Array (comma-separated)</h3>
+    <input type="text" id="arrayInput" placeholder="e.g. 5,3,8,1,9">
+    <button onclick="createArray()">Create Array</button>
+  </div>
+
+  <div class="panel">
+    <h3>Search Element</h3>
+    <input type="number" id="searchValue" placeholder="Enter value to search">
+    <button onclick="linearSearch()">Search</button>
+  </div>
+
+  <div class="panel">
+    <h3>Array Elements</h3>
+    <div class="array-display" id="arrayDisplay">
+      <!-- Array elements will appear here -->
+    </div>
+  </div>
+
+  <div class="panel">
+    <button style="background:#444;" onclick="clearArray()">Clear Array</button>
+  </div>
+</main>
+
+<footer>
+  © 2026 Yash Jain. All Rights Reserved.
+</footer>
+
+<script>
+let arrayData = [];
+
+// ======================
+// SweetAlert2 Wrapper
+// ======================
+function showMessage(title,text,icon='success'){
+  Swal.fire({
+    title:title,
+    text:text,
+    icon:icon,
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+// ======================
+// Render Array
+// ======================
+function renderArray(){
+  const container = document.getElementById("arrayDisplay");
+  container.innerHTML = '';
+  if(arrayData.length===0){
+    container.innerHTML = '<p style="color:#aaa; text-align:center; width:100%;">Array is empty</p>';
+    return;
+  }
+  arrayData.forEach(el=>{
+    const div = document.createElement('div');
+    div.className='array-element';
+    div.textContent=el;
+    container.appendChild(div);
+  });
+}
+
+// ======================
+// Create Array
+// ======================
+function createArray(){
+  const input = document.getElementById("arrayInput").value;
+  if(input.trim()===''){ showMessage('Error','Enter array elements!','error'); return; }
+  arrayData = input.split(',').map(Number);
+  renderArray();
+  showMessage('Array Created','Array has been created successfully.');
+  document.getElementById("arrayInput").value='';
+}
+
+// ======================
+// Linear Search Animation
+// ======================
+async function linearSearch(){
+  const val = document.getElementById("searchValue").value;
+  if(val===''){ showMessage('Error','Enter value to search!','error'); return; }
+  val = Number(val);
+  const elements = document.querySelectorAll('.array-element');
+  for(let i=0;i<elements.length;i++){
+    elements.forEach(el=>el.classList.remove('active','found'));
+    elements[i].classList.add('active');
+    await new Promise(r=>setTimeout(r,600));
+    if(arrayData[i]===val){
+      elements[i].classList.remove('active');
+      elements[i].classList.add('found');
+      showMessage('Found',`${val} found at index ${i}`);
+      return;
+    }
+  }
+  showMessage('Not Found',`${val} is not in the array`,'warning');
+}
+
+// ======================
+// Clear Array
+// ======================
+function clearArray(){
+  arrayData=[];
+  renderArray();
+  showMessage('Cleared','The array has been cleared.');
+}
+
+// ======================
+// Instructions
+// ======================
+function showInstructions(){
+  Swal.fire({
+    title: '<strong>Linear Search Instructions</strong>',
+    html: `
+    <div style="text-align:left; font-size:16px; line-height:1.6;">
+      <ul style="padding-left:20px;">
+        <li>Create an array by entering comma-separated numbers.</li>
+        <li>Click Search to perform step-by-step linear search.</li>
+        <li>Each element is highlighted during comparison.</li>
+        <li>Found element is marked in green.</li>
+        <li>Click Clear Array to reset.</li>
+      </ul>
+    </div>
+    `,
+    icon:'info',
+    confirmButtonText:'Got it!',
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+renderArray();
+</script>
+
+</body>
+</html>

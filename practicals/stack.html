@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stack Operations – DSA Playground</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root{
+  --bg-main:#0f1115;
+  --bg-card:#1c1f26;
+  --accent:#e53935;
+  --accent-soft:#ff6b6b;
+  --text-main:#ffffff;
+  --text-muted:#b0b3c1;
+}
+
+/* GLOBAL RESET */
+*{margin:0; padding:0; box-sizing:border-box;}
+body{
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1c1f26, var(--bg-main));
+  color:var(--text-main);
+  min-height:100vh;
+  line-height:1.6;
+}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(90deg,var(--accent),#b71c1c);
+  padding:18px 10px;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+header h1{ font-size:26px; }
+header p{ font-size:14px; opacity:0.9; }
+
+/* Instructions Button */
+#instructionBtn{
+  position:absolute;
+  right:20px;
+  top:15px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent-soft);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:0.3s;
+}
+
+#instructionBtn:hover{ background:var(--accent); }
+
+/* MAIN LAYOUT */
+main{ padding:30px 5%; }
+.section-title{ text-align:center; font-size:22px; margin-bottom:30px; color:var(--accent-soft); }
+
+/* PANEL */
+.panel{
+  background:var(--bg-card);
+  border-radius:16px;
+  padding:25px 20px;
+  margin-bottom:30px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  transition:all 0.4s ease;
+}
+.panel:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* INPUTS & BUTTONS */
+input, button{
+  font-family: inherit;
+  font-size:14px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  padding:10px;
+}
+
+input{
+  width:60%;
+  margin-right:10px;
+  background:var(--bg-main);
+  color:var(--text-main);
+  border:1px solid var(--accent);
+}
+
+button{
+  background:var(--accent);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{ background:var(--accent-soft); }
+
+/* STACK DISPLAY */
+.stack-display{
+  display:flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap:10px;
+  margin-top:20px;
+  min-height:200px;
+}
+
+.stack-element{
+  width:80px;
+  height:50px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#e53935,#ff6b6b);
+  border-radius:12px;
+  font-weight:bold;
+  color:white;
+  font-size:16px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stack-element:hover{
+  transform: scale(1.1);
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+
+/* FOOTER */
+footer{
+  margin-top:40px;
+  padding:15px;
+  text-align:center;
+  background:#12141a;
+  color:#aaa;
+  font-size:14px;
+  border-top:1px solid #222;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  input{ width:100%; margin-bottom:10px; }
+  button{ width:48%; margin-bottom:10px; }
+  .stack-element{ width:60px; height:40px; font-size:14px; }
+  #instructionBtn{ top:10px; right:10px; width:35px; height:35px; font-size:16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Stack Simulator</h1>
+  <p>Interactive DSA Playground – Yash Jain</p>
+  <button id="instructionBtn" onclick="showInstructions()">i</button>
+</header>
+
+<main>
+  <div class="section-title">Manage Your Stack</div>
+
+  <div class="panel">
+    <h3>Push Element</h3>
+    <input type="number" id="pushValue" placeholder="Enter value">
+    <button onclick="pushElement()">Push</button>
+  </div>
+
+  <div class="panel">
+    <h3>Pop Element</h3>
+    <button onclick="popElement()">Pop</button>
+  </div>
+
+  <div class="panel">
+    <h3>Peek Top Element</h3>
+    <button onclick="peekElement()">Peek</button>
+  </div>
+
+  <div class="panel">
+    <h3>Current Stack</h3>
+    <div class="stack-display" id="stackDisplay">
+      <!-- Stack elements appear here -->
+    </div>
+  </div>
+
+  <div class="panel">
+    <button style="background:#444;" onclick="clearStack()">Clear Stack</button>
+  </div>
+</main>
+
+<footer>
+  © 2026 Yash Jain. All Rights Reserved.
+</footer>
+
+<script>
+// ======================
+// Stack Storage
+// ======================
+let stack = [];
+
+// ======================
+// Display Stack
+// ======================
+function renderStack(){
+  const container = document.getElementById("stackDisplay");
+  container.innerHTML = '';
+  if(stack.length===0){
+    container.innerHTML = '<p style="color:#aaa; text-align:center; width:100%;">Stack is empty</p>';
+    return;
+  }
+  stack.forEach(el=>{
+    const div = document.createElement('div');
+    div.className='stack-element';
+    div.textContent=el;
+    container.appendChild(div);
+  });
+}
+
+// ======================
+// SweetAlert2 Wrapper
+// ======================
+function showMessage(title, text, icon='success'){
+  Swal.fire({
+    title:title,
+    text:text,
+    icon:icon,
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+// ======================
+// Push Element
+// ======================
+function pushElement(){
+  const val = document.getElementById("pushValue").value;
+  if(val===''){ showMessage('Error','Enter a value!','error'); return; }
+  stack.push(Number(val));
+  renderStack();
+  document.getElementById("pushValue").value='';
+  showMessage('Pushed',`${val} has been added to the stack.`);
+}
+
+// ======================
+// Pop Element
+// ======================
+function popElement(){
+  if(stack.length===0){
+    showMessage('Underflow','Stack is empty!','warning');
+    return;
+  }
+  const val = stack.pop();
+  renderStack();
+  showMessage('Popped',`${val} has been removed from the stack.`);
+}
+
+// ======================
+// Peek Element
+// ======================
+function peekElement(){
+  if(stack.length===0){
+    showMessage('Empty Stack','Stack is empty!','info');
+    return;
+  }
+  const val = stack[stack.length-1];
+  showMessage('Top Element',`The top element is ${val}.`);
+}
+
+// ======================
+// Clear Stack
+// ======================
+function clearStack(){
+  stack=[];
+  renderStack();
+  showMessage('Cleared','The stack has been emptied.');
+}
+
+// ======================
+// Instructions
+// ======================
+function showInstructions(){
+  Swal.fire({
+    title: '<strong>Stack Operations Instructions</strong>',
+    html: `
+    <div style="text-align:left; font-size:16px; line-height:1.6;">
+      <ul style="padding-left:20px;">
+        <li><b>Push:</b> Enter a number and click Push to add it on top of the stack.</li>
+        <li><b>Pop:</b> Removes the topmost element of the stack.</li>
+        <li><b>Peek:</b> Shows the current top element without removing it.</li>
+        <li><b>Clear Stack:</b> Empties the entire stack.</li>
+        <li>Stack follows <b>LIFO</b> principle.</li>
+        <li>Hover over elements to see highlight effect.</li>
+      </ul>
+    </div>
+    `,
+    icon:'info',
+    confirmButtonText:'Got it!',
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+renderStack();
+</script>
+
+</body>
+</html>

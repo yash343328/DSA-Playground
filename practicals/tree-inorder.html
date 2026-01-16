@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tree Traversal (Inorder) – DSA Playground</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root{
+  --bg-main:#0f1115;
+  --bg-card:#1c1f26;
+  --accent:#e53935;
+  --accent-soft:#ff6b6b;
+  --text-main:#ffffff;
+  --text-muted:#b0b3c1;
+}
+
+/* GLOBAL RESET */
+*{margin:0; padding:0; box-sizing:border-box;}
+body{
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1c1f26, var(--bg-main));
+  color:var(--text-main);
+  min-height:100vh;
+  line-height:1.6;
+}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(90deg,var(--accent),#b71c1c);
+  padding:18px 10px;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+header h1{ font-size:26px; }
+header p{ font-size:14px; opacity:0.9; }
+
+/* Instructions Button */
+#instructionBtn{
+  position:absolute;
+  right:20px;
+  top:15px;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent-soft);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:0.3s;
+}
+
+#instructionBtn:hover{ background:var(--accent); }
+
+/* MAIN LAYOUT */
+main{ padding:30px 5%; }
+.section-title{ text-align:center; font-size:22px; margin-bottom:30px; color:var(--accent-soft); }
+
+/* PANEL */
+.panel{
+  background:var(--bg-card);
+  border-radius:16px;
+  padding:25px 20px;
+  margin-bottom:30px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  transition:all 0.4s ease;
+}
+.panel:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* INPUTS & BUTTONS */
+input, button{
+  font-family: inherit;
+  font-size:14px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  padding:10px;
+}
+
+input{
+  width:60%;
+  margin-right:10px;
+  background:var(--bg-main);
+  color:var(--text-main);
+  border:1px solid var(--accent);
+}
+
+button{
+  background:var(--accent);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{ background:var(--accent-soft); }
+
+/* TREE DISPLAY */
+.tree-container{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:15px;
+  margin-top:20px;
+}
+
+.tree-node{
+  width:60px;
+  height:60px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:50%;
+  background:linear-gradient(135deg,#e53935,#ff6b6b);
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.tree-node.active{
+  background:linear-gradient(135deg,#ffb74d,#ff9800);
+  transform: scale(1.2);
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+
+.tree-node.visited{
+  background:linear-gradient(135deg,#4caf50,#81c784);
+}
+
+/* FOOTER */
+footer{
+  margin-top:40px;
+  padding:15px;
+  text-align:center;
+  background:#12141a;
+  color:#aaa;
+  font-size:14px;
+  border-top:1px solid #222;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  input{ width:100%; margin-bottom:10px; }
+  button{ width:48%; margin-bottom:10px; }
+  .tree-node{ width:50px; height:50px; font-size:14px; }
+  #instructionBtn{ top:10px; right:10px; width:35px; height:35px; font-size:16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Tree Traversal (Inorder)</h1>
+  <p>Interactive DSA Playground – Yash Jain</p>
+  <button id="instructionBtn" onclick="showInstructions()">i</button>
+</header>
+
+<main>
+  <div class="section-title">Binary Tree Inorder Traversal</div>
+
+  <div class="panel">
+    <h3>Enter Node Values (Level-wise, comma-separated, use "null" for empty)</h3>
+    <input type="text" id="treeInput" placeholder="e.g. 1,2,3,4,5,null,7">
+    <button onclick="createTree()">Create Tree</button>
+  </div>
+
+  <div class="panel">
+    <h3>Binary Tree</h3>
+    <div class="tree-container" id="treeDisplay"></div>
+  </div>
+
+  <div class="panel">
+    <button onclick="startTraversal()">Start Inorder Traversal</button>
+    <button style="background:#444;" onclick="clearTree()">Clear Tree</button>
+  </div>
+</main>
+
+<footer>
+  © 2026 Yash Jain. All Rights Reserved.
+</footer>
+
+<script>
+let treeNodes = [];
+let treeValues = [];
+
+// ======================
+// SweetAlert2 Wrapper
+// ======================
+function showMessage(title,text,icon='success'){
+  Swal.fire({
+    title:title,
+    text:text,
+    icon:icon,
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+// ======================
+// Render Tree
+// ======================
+function renderTree(highlight=-1,visited=[]){
+  const container = document.getElementById("treeDisplay");
+  container.innerHTML = '';
+  treeNodes.forEach((val,idx)=>{
+    const div = document.createElement('div');
+    div.className='tree-node';
+    if(idx===highlight) div.classList.add('active');
+    if(visited.includes(idx)) div.classList.add('visited');
+    div.textContent = val===null?'':val;
+    container.appendChild(div);
+  });
+}
+
+// ======================
+// Create Tree
+// ======================
+function createTree(){
+  const input = document.getElementById("treeInput").value;
+  if(input.trim()===''){ showMessage('Error','Enter tree node values!','error'); return; }
+  const vals = input.split(',').map(v=>v.trim()==='null'?null:Number(v.trim()));
+  treeValues = vals;
+  treeNodes = [...vals];
+  renderTree();
+  showMessage('Tree Created','Binary tree has been created successfully.');
+  document.getElementById("treeInput").value='';
+}
+
+// ======================
+// Inorder Traversal Animation
+// ======================
+async function startTraversal(){
+  if(treeNodes.length===0){ showMessage('Error','Tree is empty!','error'); return; }
+  const visited=[];
+  await inorder(0,visited);
+  showMessage('Traversal Completed','Inorder traversal completed!');
+}
+
+async function inorder(index,visited){
+  if(index>=treeNodes.length || treeNodes[index]===null) return;
+  // Left child
+  await inorder(2*index+1,visited);
+  // Visit current
+  visited.push(index);
+  renderTree(index,visited);
+  await new Promise(r=>setTimeout(r,800));
+  // Right child
+  await inorder(2*index+2,visited);
+}
+
+// ======================
+// Clear Tree
+// ======================
+function clearTree(){
+  treeNodes=[];
+  treeValues=[];
+  renderTree();
+  showMessage('Cleared','Tree has been cleared.');
+}
+
+// ======================
+// Instructions
+// ======================
+function showInstructions(){
+  Swal.fire({
+    title: '<strong>Inorder Traversal Instructions</strong>',
+    html: `
+    <div style="text-align:left; font-size:16px; line-height:1.6;">
+      <ul style="padding-left:20px;">
+        <li>Enter the node values in level order (comma-separated). Use "null" for empty nodes.</li>
+        <li>Click "Create Tree" to display the binary tree.</li>
+        <li>Click "Start Inorder Traversal" to animate traversal step-by-step.</li>
+        <li>Current node is highlighted in orange; visited nodes turn green.</li>
+        <li>Click "Clear Tree" to reset.</li>
+      </ul>
+    </div>
+    `,
+    icon:'info',
+    confirmButtonText:'Got it!',
+    confirmButtonColor:'#e53935',
+    background:'#1c1f26',
+    color:'#ffffff'
+  });
+}
+
+renderTree();
+</script>
+
+</body>
+</html>
